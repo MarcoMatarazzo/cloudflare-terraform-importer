@@ -66,7 +66,7 @@ def main():
             zone_file.write( 'resource "cloudflare_record" "%s" {\n' % record_name )
             zone_file.write( '  domain  = "%s"\n' % zone['name'] )
             zone_file.write( '  name    = "%s"\n' % record['name'].replace(".%s" % zone['name'],'') )
-            zone_file.write( '  value   = "%s"\n' % record['content'].replace(".%s" % zone['name'],'') )
+            zone_file.write( '  value   = "%s"\n' % record['content'] )
             zone_file.write( '  type    = "%s"\n' % record['type'] )
             if record['type'] == 'MX':
                 zone_file.write( '  priority = "%s"\n' % record['priority'] ) 
