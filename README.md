@@ -1,14 +1,24 @@
 # CloudFlare Terraform Importer Primer
 
-This script uses CloudFlare API to read your current zones and records, and generates all the necessary files to import them in Terraform without the need to write .tf files from scratch.
+A script that reads your CloudFlare data and generates the necessary files to import them in Terraform.
+
+It works by connecting to CloudFlare API and generating both .tf files (so you don't have to write them from scratch) and some import scripts that will use Terraform import capabilities to populate your .tfstate.
+
+## Installation
+
+    git clone https://github.com/MarcoMatarazzo/cloudflare-terraform-importer.git
+
+That's it.
+
+## Requirements
+
+You should only require plain Python 2.x on a Linux box - and Terraform knowledge, that is outside the scope of this README.
 
 ## Usage
 
-The project is pretty simple and straightforward, and should only require plain Python 2.x - and Terraform knowledge, that is outside the scope of this README.
+## A Warning in advance
 
-### A Warning in advance
-
-This script is (somewhat) tested, but I recommend to __BACKUP YOUR TERRAFORM FILE, ESPECIALLY YOUR .TFSTATE FILE__ before using this script.
+__BACKUP YOUR TERRAFORM FILE, ESPECIALLY YOUR .TFSTATE FILE__ before using this script.
 
 You should be already doing it, but you know, better safe than sorry.
 
@@ -22,11 +32,11 @@ Create your configuration from the sample:
 
 Then, add your CloudFlare email and api key (read [here](https://support.cloudflare.com/hc/en-us/articles/200167836-Where-do-I-find-my-Cloudflare-API-key-) if you don't know how to find them). 
 
-You can also change the directory in which all files will get created. Default is *./tf_output_*.
+You can also change the directory in which all files will get created. Default is _./tf_output_.
 
 ### Generating the files
 
-You can simply run the script with:
+Run the script with:
 
     ./init.py
 
@@ -34,11 +44,19 @@ It will create all files in the output directory, that will then contain:
 * one zone_name.tf file for each zone
 * one import-zone_name.sh shell script to actually import the enumerated resources in your .tfstate
 
+You probably want to make the shell script executable:
+
+    chmod +x *.sh
+
 ### Import into Terraform
 
-At this point, you will just need to move the files in your terraform directory and execute the shell scripts (you will need to make them executable).
+Move the files in your terraform directory. 
 
-Note: if you choose to have better resource names in your .tf files, you will have to also change them in the corresponding import script(s).
+You may want to reorganize the .tf files, depending on your situation. Note that if you change resource names, you will have to also change them in the corresponding import script(s). A better idea could be to slightly edit the python script to generate a more fitting resource name.
+
+After that, execute the shell scripts that will import the resources. They will execute multiple `terraform import` with the needed parameters for your newly added resources.
+
+You can then check that everything is ok with `terraform plan`.
 
 ## License
 
