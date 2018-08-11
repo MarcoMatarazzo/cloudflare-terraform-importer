@@ -1,0 +1,6 @@
+[cloudflare]
+email = your@email.com
+key = 123456789abcdef123456789abcdef
+
+[output]
+dir_name = tf_output
