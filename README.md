@@ -14,15 +14,15 @@ That's it.
 
 You should only require plain Python 2.x on a Linux box - and Terraform knowledge, that is outside the scope of this README.
 
-## Usage
-
-## A Warning in advance
+## A warning in advance
 
 __BACKUP YOUR TERRAFORM FILE, ESPECIALLY YOUR .TFSTATE FILE__ before using this script.
 
 You should be already doing it, but you know, better safe than sorry.
 
 Let me repeat myself: __BACKUP YOUR FILES__ before using this script.
+
+## Usage
 
 ### Configuration
 
@@ -48,7 +48,7 @@ You probably want to make the shell script executable:
 
     chmod +x *.sh
 
-### Import into Terraform
+### Importing into Terraform
 
 Move the files in your terraform directory. 
 
