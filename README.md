@@ -6,6 +6,14 @@ This script uses CloudFlare API to read your current zones and records, and gene
 
 The project is pretty simple and straightforward, and should only require plain Python 2.x - and Terraform knowledge, that is outside the scope of this README.
 
+### A Warning in advance
+
+This script is (somewhat) tested, but I recommend to __BACKUP YOUR TERRAFORM FILE, ESPECIALLY YOUR .TFSTATE FILE__ before using this script.
+
+You should be already doing it, but you know, better safe than sorry.
+
+Let me repeat myself: __BACKUP YOUR FILES__ before using this script.
+
 ### Configuration
 
 Create your configuration from the sample:
