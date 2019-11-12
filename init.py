@@ -34,8 +34,7 @@ def main():
     read_config()
 
     headers = {
-        "X-Auth-Email": cf_email,
-        "X-Auth-Key": cf_key
+        "Authorization": "Bearer %s" % cf_token
     }
 
     try:
@@ -47,8 +46,7 @@ def main():
 
     provider_file = open('%s/provider.tf' % outdir, "w")
     provider_file.write( 'provider "cloudflare" {\n')
-    provider_file.write( '    email = "%s"\n' % cf_email )
-    provider_file.write( '    token = "%s"\n' % cf_key )
+    provider_file.write( '    api_token = "%s"\n' % cf_token )
     provider_file.write( '}\n')
     provider_file.close()
 
@@ -56,15 +54,21 @@ def main():
 
     for zone in zones:
         # print "* Zone found: %s (id: %s)" % (zone['name'], zone['id'])
-        zone_file = open('%s/%s.tf' % ( outdir, zone['name'] ), "w")
+        zone_file = open('%s/dns_%s.tf' % ( outdir, zone['name'] ), "w")
         import_file = open('%s/import-%s.sh' % ( outdir, zone['name'] ), "w")
         import_file.write( '#!/bin/bash\n\n' )
+        zone_file.write( 'resource "cloudflare_zone" "%s" {\n' % zone['name'].replace('.','_') )
+        zone_file.write( '  zone = "%s"\n' % zone['name'] )
+        zone_file.write( '  # id = "%s"\n' % zone['id'] )
+        zone_file.write( '}\n')
+        zone_file.write( '\n')
+        import_file.write( 'terraform import cloudflare_zone.%s %s\n' % ( zone['name'].replace('.','_'), zone['id'] ) )
         records = get_cf_data( 'zones/%s/dns_records' % zone['id'] )
         for record in records:
             # print "  - Record found: %s %s %s %s" % ( record['type'], record['name'], record['content'], record['priority'] if record['type'] == 'MX' else '')
             record_name = "%s-%s" % ( record['name'].replace('.','_').replace('*','STAR'), record['id'] ) # This can be made better according to your tastes
             zone_file.write( 'resource "cloudflare_record" "%s" {\n' % record_name )
-            zone_file.write( '  domain  = "%s"\n' % zone['name'] )
+            zone_file.write( '  zone_id = "${cloudflare_zone.%s.id}"\n' % zone['name'].replace('.','_') )
             zone_file.write( '  name    = "%s"\n' % record['name'].replace(".%s" % zone['name'],'') )
             zone_file.write( '  value   = "%s"\n' % record['content'] )
             zone_file.write( '  type    = "%s"\n' % record['type'] )
@@ -74,23 +78,21 @@ def main():
             zone_file.write( '  proxied = %s\n' % ('true' if record['proxied'] else 'false') )
             zone_file.write( '}\n')
             zone_file.write( '\n')
-            import_file.write( 'terraform import cloudflare_record.%s %s/%s\n' % ( record_name, zone['name'], record['id'] ) )
+            import_file.write( 'terraform import cloudflare_record.%s %s/%s\n' % ( record_name, zone['id'], record['id'] ) )
         zone_file.close()
         import_file.close()
     
     print "All files created in directory %s." % outdir
 
 def read_config():
-    global cf_email
-    global cf_key
+    global cf_token
     global outdir
     
     config = configparser.ConfigParser()
     
     try:
         config.read('config.ini')
-        cf_email = config.get('cloudflare', 'email')
-        cf_key = config.get('cloudflare', 'key')
+        cf_token = config.get('cloudflare', 'token')
         outdir = config.get('output', 'dir_name')
     except:
         print "Error while reading configuration file."

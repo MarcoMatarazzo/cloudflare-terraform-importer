@@ -1,6 +1,5 @@
 [cloudflare]
-email = your@email.com
-key = 123456789abcdef123456789abcdef
+token = A1b2C3d4E5f6G7h8I9j0k1L2m3N4o5P6q7R8s9T0
 
 [output]
 dir_name = tf_output
